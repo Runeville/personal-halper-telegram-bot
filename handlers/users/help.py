@@ -9,6 +9,7 @@ async def bot_help(message: types.Message):
     text = ("You can send me those commands and I will execute them: ",
             "/start - Starts dialog with Jake",
             "/help - Gives help information",
-            "/physics - Shows physics playlist")
+            "/physics - Shows physics playlist",
+            "/convert - Converts usd to rub")
     
     await message.answer("\n".join(text))
