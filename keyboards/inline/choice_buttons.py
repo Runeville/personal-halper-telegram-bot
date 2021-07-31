@@ -6,11 +6,9 @@ physics_navigation = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(text="<<", callback_data=physics_callback.new(
-                # watch="watch",
                 direction="prev"
             )),
             InlineKeyboardButton(text=">>", callback_data=physics_callback.new(
-                # watch="watch",
                 direction="next"
             )),
         ],
