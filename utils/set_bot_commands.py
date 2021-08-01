@@ -7,6 +7,6 @@ async def set_default_commands(dp):
             types.BotCommand("start", "Start dialog with Jake"),
             types.BotCommand("help", "Show help"),
             types.BotCommand("physics", "Show physics"),
-            types.BotCommand("convert", "Convert usd to rub")
+            types.BotCommand("convert", "Convert currency")
         ]
     )

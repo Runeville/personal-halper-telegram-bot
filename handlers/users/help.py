@@ -10,6 +10,6 @@ async def bot_help(message: types.Message):
             "/start - Starts dialog with Jake",
             "/help - Gives help information",
             "/physics - Shows physics playlist",
-            "/convert - Converts usd to rub")
+            "/convert - Converts currency")
     
     await message.answer("\n".join(text))
