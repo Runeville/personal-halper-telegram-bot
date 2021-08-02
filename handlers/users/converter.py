@@ -85,7 +85,8 @@ async def answer_currency(message: Message, state: FSMContext):
             cur_from = currencies_dict[data['currency_from']]  # Getting uppercase value
             cur_to = currencies_dict[data['currency_to']]  # Getting uppercase value
 
-            converted_cur = parse_currency(cur_value, cur_from, cur_to).split(".")[0]  # Getting converted value
+            # converted_cur = parse_currency(cur_value, cur_from, cur_to).split(".")[0]  # Getting converted value
+            converted_cur = parse_currency(cur_value, cur_from, cur_to)  # Getting converted value
         if converted_cur is not None:  # It is None when bot can't connect to website where it parses data
             await message.answer(f"<b>{cur_value} {cur_from}</b> "
                                  f"is equal to <b>{converted_cur} {cur_to}</b>, bro!")
