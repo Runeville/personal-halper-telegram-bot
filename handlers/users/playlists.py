@@ -1,5 +1,5 @@
 from aiogram.dispatcher.filters import Command
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message, CallbackQuery
 from aiogram.dispatcher import FSMContext
 
 import googleapiclient.discovery as g_disc
@@ -7,22 +7,17 @@ import googleapiclient.errors
 from urllib.parse import parse_qs, urlparse
 
 from data.config import YOUTUBE_API_KEY
+from keyboards.inline.callback_datas import playlists_callback
+from keyboards.inline.playlists_buttons import playlists_navigation, get_videos_navigation
 
 from loader import dp
 from states.playlists_state import PlaylistsStates
 from handlers.users.db_manager import DBManager
 
 
-@dp.message_handler(Command("playlists"))
-async def get_playlist_link(message: Message):
-    await message.answer(text="Give me a link.")
-    await PlaylistsStates.first()
-
-
 @dp.message_handler(state=PlaylistsStates.link)
 async def get_playlist_title(message: Message, state: FSMContext):
     url: str = message.text.strip()
-    await message.answer("One sec, bro.")
 
     # Trying to connect to this url
     try:
@@ -72,3 +67,34 @@ async def create_playlist(message: Message, state: FSMContext):
     await state.finish()
 
 
+@dp.message_handler(Command("playlists"))
+async def get_playlist_link(message: Message):
+    user_id = int(message.from_user.id)
+
+    await message.answer(text="Here's you playlists, dude.", reply_markup=playlists_navigation(user_id))
+
+
+@dp.callback_query_handler(playlists_callback.filter())
+async def video_handler(call: CallbackQuery, callback_data: dict):
+    if callback_data['method'] == "create":
+        await call.message.answer(text="Give me a link to YouTube playlist.")
+        await PlaylistsStates.first()
+
+    elif callback_data['method'] == 'watch':
+        if callback_data['direction'] == "0":
+            video = DBManager().select_current_video_by_playlist_id(playlist_id=int(callback_data['playlist_id']))
+
+            await call.message.answer(text=f"{video.title}\n"
+                                           f"{video.link}",
+                                      reply_markup=get_videos_navigation(callback_data['playlist_id']))
+        else:
+            if callback_data['direction'] == "next":
+                video = DBManager().switch_video(callback_data['playlist_id'])
+            else:
+                video = DBManager().switch_video(callback_data['playlist_id'], False)
+
+            await call.message.answer(text=f"{video.title}\n"
+                                           f"{video.link}",
+                                      reply_markup=get_videos_navigation(callback_data['playlist_id']))
+
+    await call.message.delete()

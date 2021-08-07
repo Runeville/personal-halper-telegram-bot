@@ -8,7 +8,6 @@ env.read_env()
 
 YOUTUBE_API_KEY = "AIzaSyDd33yrnCep6-cmae1Om7LSJtmOxaYdDBU"
 
-DATA_DIR = os.path.dirname(os.path.abspath(__file__)) + "/"
 BASE_DIR = os.path.dirname(os.path.abspath(__file__)).replace("\\data", "")
 
 DB_NAME = "bot_db.db"

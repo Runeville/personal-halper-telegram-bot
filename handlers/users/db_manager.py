@@ -26,6 +26,7 @@ class DBManager:
         Column("id", Integer, primary_key=True),
         Column("title", String(250), nullable=False),
         Column("link", String(500), nullable=False),
+        Column("serial_number", Integer, nullable=False),
         Column("is_watched", Boolean, default=False),
         Column("playlist_id", Integer, ForeignKey("Playlists.id"))
     )
@@ -43,19 +44,55 @@ class DBManager:
     def create_playlist(self, name: str, videos: list, user_id: int):
         add_playlist = self.playlists.insert().values(title=name, user_id=user_id)
         playlist_id = self.connection.execute(add_playlist).lastrowid
-
+        serial_number = 0
         for video in videos:
             title = video['snippet']['title']
 
             if title != "Private video":
+                serial_number += 1
                 link = f'https://www.youtube.com/watch?v={video["snippet"]["resourceId"]["videoId"]}'
                 add_video = self.videos.insert().values(title=title,
                                                         link=link,
-                                                        playlist_id=playlist_id)
+                                                        playlist_id=playlist_id,
+                                                        serial_number=serial_number)
                 self.connection.execute(add_video)
 
-    def select_user_by_id(self, user_id: int):
-        s = self.users.select().where(self.users.c.telegram_id == user_id)
-        s = self.connection.execute(s)
-        for i in s:
-            return i
+    def select_playlists_by_user_id(self, user_id):
+        s = self.playlists.select().where(self.playlists.c.user_id == user_id)
+        playlists = self.connection.execute(s).all()
+
+        return playlists
+
+    def select_videos_by_playlist_id(self, playlist_id):
+        s = self.videos.select().where(self.videos.c.playlist_id == playlist_id)
+        videos = self.connection.execute(s).all()
+
+        return videos
+
+    def select_current_video_by_playlist_id(self, playlist_id):
+        current_video = self.videos.select().where(self.videos.c.playlist_id == playlist_id,
+                                                   self.videos.c.is_watched == False)
+        current_video = self.connection.execute(current_video).first()
+
+        return current_video
+
+    def select_video_by_its_serial_number(self, playlist_id, serial_number):
+        video = self.videos.select(). \
+            where(self.videos.c.playlist_id == playlist_id, self.videos.c.serial_number == serial_number)
+        video = self.connection.execute(video).first()
+        return video
+
+    def switch_video(self, playlist_id, is_next=True):
+        serial_number = int(self.select_current_video_by_playlist_id(playlist_id).serial_number)
+
+        if is_next:
+            video = self.videos.update().where(self.videos.c.playlist_id == playlist_id,
+                                               self.videos.c.serial_number == serial_number).values(is_watched=True)
+        else:
+            video = self.videos.update().where(self.videos.c.playlist_id == playlist_id,
+                                               self.videos.c.serial_number == serial_number - 1).values(
+                is_watched=False)
+        self.connection.execute(video)
+
+        video = self.select_current_video_by_playlist_id(playlist_id)
+        return video

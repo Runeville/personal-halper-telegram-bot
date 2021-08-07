@@ -1,5 +1,4 @@
 from . import db_manager
-from . import physics
 from . import converter
 from . import playlists
 from . import help
