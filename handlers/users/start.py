@@ -12,7 +12,7 @@ async def bot_start(message: types.Message):
     first_name = message.from_user.first_name
     last_name = message.from_user.last_name
     username = message.from_user.username
-    user_telegram_id = message.from_user.id
+    user_id = int(message.from_user.id)
 
     user = DBManager()
-    user.create_user(first_name, last_name, username, user_telegram_id)
+    user.create_user(user_id, first_name, last_name, username)

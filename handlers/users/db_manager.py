@@ -8,10 +8,9 @@ class DBManager:
 
     users = Table(
         "Users", meta,
-        Column("id", Integer, primary_key=True),
+        Column("id", Integer, nullable=False),
         Column("first_name", String(250), nullable=False),
         Column("last_name", String(250), nullable=False),
-        Column("telegram_id", Integer, nullable=False),
         Column("username", String(250), nullable=False)
     )
 
@@ -37,9 +36,8 @@ class DBManager:
 
         self.connection = engine.connect()
 
-    def create_user(self, first_name: str, last_name: str, username: str, user_id: int):
-        add_user = self.users.insert().values(first_name=first_name, last_name=last_name, username=username,
-                                              telegram_id=user_id)
+    def create_user(self, user_id: int, first_name: str, last_name: str, username: str):
+        add_user = self.users.insert().values(id=user_id, first_name=first_name, last_name=last_name, username=username)
         self.connection.execute(add_user)
 
     def create_playlist(self, name: str, videos: list, user_id: int):
@@ -56,8 +54,8 @@ class DBManager:
                                                         playlist_id=playlist_id)
                 self.connection.execute(add_video)
 
-    def select_user_by_telegram_id(self, telegram_id: int):
-        s = self.users.select().where(self.users.c.telegram_id == telegram_id)
+    def select_user_by_id(self, user_id: int):
+        s = self.users.select().where(self.users.c.telegram_id == user_id)
         s = self.connection.execute(s)
         for i in s:
             return i

@@ -39,6 +39,7 @@ async def get_playlist_title(message: Message, state: FSMContext):
     # Handling exceptions
     except KeyError:
         await message.answer(text="Seems like you you sent me some bullshit when I requested a link.")
+        await state.finish()
     except googleapiclient.errors.HttpError:
         await message.answer(text="Hey, you know. I can't really connect using this link.")
         await state.finish()
@@ -63,8 +64,8 @@ async def create_playlist(message: Message, state: FSMContext):
         data['title'] = message.text.strip()
 
         playlist = DBManager()
-        user_telegram_id = int(playlist.select_user_by_telegram_id(message.from_user.id).id)
-        playlist.create_playlist(data['title'], data['videos'], user_telegram_id)
+        user_id = int(message.from_user.id)
+        playlist.create_playlist(data['title'], data['videos'], user_id)
 
     await message.answer(text='Yeah! I\'ve created your playlist! To check it type "/playlists"')
 
