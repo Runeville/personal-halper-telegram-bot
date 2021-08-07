@@ -8,7 +8,7 @@ class DBManager:
 
     users = Table(
         "Users", meta,
-        Column("id", Integer, nullable=False),
+        Column("id", Integer, nullable=False, unique=True),
         Column("first_name", String(250), nullable=False),
         Column("last_name", String(250), nullable=False),
         Column("username", String(250), nullable=False)
