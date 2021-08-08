@@ -65,9 +65,7 @@ class DBManager:
 
     def select_playlists_by_user_id(self, user_id):
         s = self.playlists.select().where(self.playlists.c.user_id == user_id)
-        playlists = self.connection.execute(s).all()
-
-        return playlists
+        return self.connection.execute(s).all()
 
     def edit_playlist(self, playlist_id, new_title):
         playlist = self.playlists.update().where(self.playlists.c.id == playlist_id).values(title=new_title)
@@ -82,22 +80,17 @@ class DBManager:
 
     def select_videos_by_playlist_id(self, playlist_id):
         s = self.videos.select().where(self.videos.c.playlist_id == playlist_id)
-        videos = self.connection.execute(s).all()
-
-        return videos
+        return self.connection.execute(s).all()
 
     def select_current_video_by_playlist_id(self, playlist_id):
         current_video = self.videos.select().where(self.videos.c.playlist_id == playlist_id,
                                                    self.videos.c.is_watched == False)
-        current_video = self.connection.execute(current_video).first()
+        return self.connection.execute(current_video).first()
 
-        return current_video
-
-    def select_video_by_its_serial_number(self, playlist_id, serial_number):
+    def select_video_by_serial_number(self, playlist_id, serial_number):
         video = self.videos.select(). \
             where(self.videos.c.playlist_id == playlist_id, self.videos.c.serial_number == serial_number)
-        video = self.connection.execute(video).first()
-        return video
+        return self.connection.execute(video).first()
 
     def switch_video(self, playlist_id, is_next=True):
         serial_number = int(self.select_current_video_by_playlist_id(playlist_id).serial_number)
@@ -107,9 +100,8 @@ class DBManager:
                                                self.videos.c.serial_number == serial_number).values(is_watched=True)
         else:
             video = self.videos.update().where(self.videos.c.playlist_id == playlist_id,
-                                               self.videos.c.serial_number == serial_number - 1).values(
-                is_watched=False)
+                                               self.videos.c.serial_number == serial_number - 1).\
+                                                    values(is_watched=False)
         self.connection.execute(video)
 
-        video = self.select_current_video_by_playlist_id(playlist_id)
-        return video
+        return self.select_current_video_by_playlist_id(playlist_id)
