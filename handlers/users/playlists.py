@@ -11,7 +11,7 @@ from keyboards.inline.callback_datas import playlists_callback
 from keyboards.inline.playlists_buttons import playlists_navigation, get_videos_navigation
 
 from loader import dp
-from states.playlists_state import PlaylistsStates, PlaylistsDeleteStates
+from states.playlists_state import PlaylistsStates, PlaylistsDeleteStates, PlaylistsEditStates
 from handlers.users.db_manager import DBManager
 
 
@@ -53,13 +53,23 @@ async def get_playlist_title(message: Message, state: FSMContext):
         await PlaylistsStates.next()
 
 
+@dp.message_handler(state=PlaylistsEditStates.edit)
+async def edit_playlist(message: Message, state: FSMContext):
+    playlist_title = message.text.strip()
+    playlist_state = await state.get_data()
+    DBManager().edit_playlist(playlist_state['playlist_id'], playlist_title)
+    await message.answer(text="Playlist name was changed.")
+
+    await state.finish()
+
+
 @dp.message_handler(state=PlaylistsDeleteStates.delete)
 async def delete_playlist(message: Message, state: FSMContext):
     playlist_title = message.text.strip()
     playlist_state = await state.get_data()
     if playlist_title == DBManager().select_playlist_by_id(playlist_state['playlist_id'])['title']:
         DBManager().delete_playlist(playlist_state['playlist_id'])
-        await message.answer(text="This playlist will no longer bother you.")
+        await message.answer(text="This playlist will no longer bother you...")
     else:
         await message.answer(text="Names doesn't match.")
     await state.finish()
@@ -91,6 +101,15 @@ async def video_handler(call: CallbackQuery, callback_data: dict):
     if callback_data['method'] == "create":
         await call.message.answer(text="Give me a link to YouTube playlist.")
         await PlaylistsStates.first()
+
+    elif callback_data['method'] == "edit":
+        playlist = DBManager().select_playlist_by_id(callback_data['playlist_id'])
+        await call.message.answer(f"How do you want to rename it?")
+
+        await PlaylistsEditStates.first()
+
+        state = dp.current_state(chat=call.message.chat.id, user=call.from_user.id)
+        await state.update_data(playlist_id=playlist['id'])
 
     elif callback_data['method'] == "delete":
         playlist = DBManager().select_playlist_by_id(callback_data['playlist_id'])

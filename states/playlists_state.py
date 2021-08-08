@@ -8,3 +8,7 @@ class PlaylistsStates(StatesGroup):
 
 class PlaylistsDeleteStates(StatesGroup):
     delete = State()
+
+
+class PlaylistsEditStates(StatesGroup):
+    edit = State()

@@ -69,6 +69,10 @@ class DBManager:
 
         return playlists
 
+    def edit_playlist(self, playlist_id, new_title):
+        playlist = self.playlists.update().where(self.playlists.c.id == playlist_id).values(title=new_title)
+        self.connection.execute(playlist)
+
     def delete_playlist(self, playlist_id):
         playlist = self.playlists.delete().where(self.playlists.c.id == playlist_id)
         self.connection.execute(playlist)
