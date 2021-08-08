@@ -13,8 +13,11 @@ def playlists_navigation(user_id):
 
     playlists = DBManager().select_playlists_by_user_id(user_id=user_id)
     for playlist in playlists:
+        videos = DBManager().select_videos_by_playlist_id(playlist['id'])
+        current_video = DBManager().select_current_video_by_playlist_id(playlist['id'])['serial_number']
         markup.add(
-            InlineKeyboardButton(text=playlist.title, callback_data=make_callback("watch", playlist_id=playlist.id))
+            InlineKeyboardButton(text=f"{playlist.title} — {current_video}/{len(videos)}",
+                                 callback_data=make_callback("watch", playlist_id=playlist.id))
         )
 
     markup.add(InlineKeyboardButton(text="Create new playlist", callback_data=make_callback("create")))
