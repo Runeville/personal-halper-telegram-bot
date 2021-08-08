@@ -38,6 +38,7 @@ def get_videos_navigation(playlist_id):
     if next_video:
         markup.insert(InlineKeyboardButton(text=">>",
                                            callback_data=make_callback("watch", playlist_id, "next")))
+    markup.add(InlineKeyboardButton(text="Delete", callback_data=make_callback("delete", playlist_id)))
     markup.add(InlineKeyboardButton(text="Cancel", callback_data=make_callback("cancel")))
 
     return markup

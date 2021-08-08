@@ -57,11 +57,24 @@ class DBManager:
                                                         serial_number=serial_number)
                 self.connection.execute(add_video)
 
+    def select_playlist_by_id(self, playlist_id):
+        playlist = self.playlists.select().where(self.playlists.c.id == playlist_id)
+        playlist = self.connection.execute(playlist).first()
+
+        return playlist
+
     def select_playlists_by_user_id(self, user_id):
         s = self.playlists.select().where(self.playlists.c.user_id == user_id)
         playlists = self.connection.execute(s).all()
 
         return playlists
+
+    def delete_playlist(self, playlist_id):
+        playlist = self.playlists.delete().where(self.playlists.c.id == playlist_id)
+        self.connection.execute(playlist)
+
+        videos = self.videos.delete().where(self.videos.c.playlist_id == playlist_id)
+        self.connection.execute(videos)
 
     def select_videos_by_playlist_id(self, playlist_id):
         s = self.videos.select().where(self.videos.c.playlist_id == playlist_id)
