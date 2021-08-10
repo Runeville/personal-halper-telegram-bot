@@ -32,10 +32,12 @@ class DBManager:
     )
 
     def __init__(self):
-        engine = create_engine(f"sqlite:///{BASE_DIR}/{DB_NAME}")
-        self.meta.create_all(engine)
+        self.engine = create_engine(f"sqlite:///{BASE_DIR}/{DB_NAME}")
 
-        self.connection = engine.connect()
+        self.connection = self.engine.connect()
+
+    def create_db(self):
+        self.meta.create_all(self.engine)
 
     def create_user(self, user_id: int, first_name: str, last_name: str, username: str):
         add_user = self.users.insert().values(id=user_id, first_name=first_name, last_name=last_name, username=username)
