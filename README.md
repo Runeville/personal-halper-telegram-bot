@@ -13,4 +13,4 @@ To activate this bot:
 3) Change .env.example settings and rename the file to .env
 
 # Author 
-(C) 2021 Charles Fineman. https://github.com/Runeville
+(C) 2021 Johan Perrier. https://github.com/Runeville
