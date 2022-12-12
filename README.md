@@ -2,7 +2,7 @@
 Check Jake here: https://t.me/JakeHelperBot
 
 # Description
-This bot has to functions:
+This bot has two functions:
 1) Using command /convert you can convert currencies. Allowed currencies: USD, RUB, EUR
 2) Using command /playlist you can add YouTube playlist, watch its videos one by one having interface with arrows and JakeBot will remember where you stopped, so that next time you will be watching playlist from video that you are currently on.
 
